@@ -11,6 +11,8 @@ class DrawMap:
         self.mapnow = copy.deepcopy(map)
         self.screen = ai_game.screen
         self.screen_rect = ai_game.screen.get_rect()
+        self.states = ai_game.states
+        self.trap_sound = ai_game.dead_sound
         self.img = None
         self.rect = None
         self.inmap1 = None  # 判断下一个点是否在地图内
@@ -54,8 +56,12 @@ class DrawMap:
             self.inmap2 = False
 
         # 对移动的下一个点和下下一个点进行判定
+        # 踩到陷阱
+        if self.inmap1 and map[x1][y1] == trap:
+            self.states.game_active = "TRAP"
+            self.trap_sound.play()
         # 下一点为路面
-        if self.inmap1 and self.mapnow[x1][y1] == road:
+        elif self.inmap1 and self.mapnow[x1][y1] == road:
             self.moveman()
             self.mapnow[x1][y1] = worker
             self.workerx = x1

@@ -8,7 +8,8 @@ imgs = [pygame.image.load('bmp/wall.png'),
         pygame.image.load('bmp/Passageway.png'),
         pygame.image.load('bmp/Destination.png'),
         pygame.image.load('bmp/WorkerInDest.png'),
-        pygame.image.load('bmp/RedBox.png')]
+        pygame.image.load('bmp/RedBox.png'),
+        pygame.image.load('bmp/Passageway.png')]
 
 # 0代表墙，1代表人，2代表箱子，3代表路，4代表目的地
 # 5代表人在目的地，6代表放到目的地的箱子
@@ -19,6 +20,7 @@ road = 3
 destination = 4
 man_in_des = 5
 box_in_des = 6
+trap = 7
 
 map = [[0, 3, 1, 4, 3, 3, 3],
        [0, 3, 3, 2, 3, 3, 0],

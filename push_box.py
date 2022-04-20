@@ -22,6 +22,7 @@ class PushBox:
         self.back_ground_pic = pygame.image.load('bmp/bgp.bmp')
         self.done_pic = pygame.image.load('bmp/done.gif')
         self.dead_pic = pygame.image.load('bmp/dead.jpg')
+        self.trap_pic = pygame.image.load('bmp/trap.jpg')
 
         pygame.mixer.music.load('music/bgm.mp3')  # 载入背景音乐文件
         pygame.mixer.music.set_volume(0.2)  # 设定背景音乐音量
@@ -30,6 +31,7 @@ class PushBox:
         self.restart_sound = pygame.mixer.Sound('music/restart.wav')  # 载入推箱子声音文件
         self.done_sound = pygame.mixer.Sound('music/done.wav')  # 载入通关声音文件
         self.dead_sound = pygame.mixer.Sound('music/dead.mp3')  # 载入失败声音文件
+        self.finish_sound = pygame.mixer.Sound('music/finish.wav')  # 载入过关音效
 
         self.states = GameStates()
         # 创建按钮
@@ -80,7 +82,7 @@ class PushBox:
                     self.map.initmap()
                 # 按到再试一次
                 if self.retry_button.rect.collidepoint(mouse_pot) and (
-                        self.states.game_active == "FINISH" or self.states.game_active == "DEAD"):
+                        self.states.game_active == "FINISH" or self.states.game_active == "DEAD" or self.states.game_active == "TRAP"):
                     self.states.game_active = "STARTED"  # 切换程序状态
                     # 重新设置第三关计时器
                     if self.states.level == 3:
@@ -148,6 +150,7 @@ class PushBox:
                 if self._check_finish():
                     if self.states.level != 5:
                         self.states.game_active = "FINISH"
+                        self.finish_sound.play()
                     else:
                         self.states.game_active = "DONE"
                         self.done_sound.play()
@@ -170,6 +173,12 @@ class PushBox:
                 self._check_events()
                 self.screen.fill(self.bg_color)
                 self.screen.blit(self.dead_pic, self.dead_pic.get_rect())
+                self.retry_button.draw_button()
+
+            elif self.states.game_active == "TRAP":
+                self._check_events()
+                self.screen.fill(self.bg_color)
+                self.screen.blit(self.trap_pic, self.trap_pic.get_rect())
                 self.retry_button.draw_button()
 
             self.about_button.draw_button()
