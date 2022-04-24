@@ -1,8 +1,9 @@
 import sys
 import os
-
+import PCF8591 as ADC
 import pygame
 
+import joystick
 from behaviour import *
 from game_states import *
 from button import Button
@@ -43,6 +44,33 @@ class PushBox:
         self.again_button = Button(self, "again", 112, 112)
 
         self.map = DrawMap(self)
+
+    def _check_event(self, event):
+        """检测摇杆"""
+        if event == 1 or event == 2 or event == 3 or event == 4:
+            if event == 4:
+                # 向右移动一格工人
+                print(event, 'qian')
+                self.map.moveto(self.map.workerx + 1, self.map.workery, self.map.workerx + 2, self.map.workery)
+                print(event, 'hou')
+            if event == 3:
+                print(event, 'qian')
+                # 向左移动一格工人
+                self.map.moveto(self.map.workerx - 1, self.map.workery, self.map.workerx - 2, self.map.workery)
+                print(event, 'hou')
+            if event == 2:
+                # 向下移动一格工人
+                print(event, 'qian')
+                self.map.moveto(self.map.workerx, self.map.workery + 1, self.map.workerx, self.map.workery + 2)
+                print(event, 'hou')
+            if event == 1:
+                # 向上移动一格工人
+                print(event, 'qian')
+                self.map.moveto(self.map.workerx, self.map.workery - 1, self.map.workerx, self.map.workery - 2)
+                print(event, 'hou')
+
+        print(event)
+        self.push_sound.play()
 
     def _check_events(self):
         """检测鼠标及键盘按键"""
@@ -96,10 +124,10 @@ class PushBox:
                     self.map.initmap()
                 # 按到关于
                 if self.about_button.rect.collidepoint(mouse_pot):
-                    os.system(r"notepad .//explanation//about.txt")
+                    os.startfile(r"mousepad .//explanation//about.txt")
                 # 按到帮助
                 if self.help_button.rect.collidepoint(mouse_pot):
-                    os.system(r"notepad .//explanation//help.txt")
+                    os.system(r"mousepad .//explanation//help.txt")
                 # 按到开始
                 if self.start_button.rect.collidepoint(mouse_pot) and self.states.game_active == "NOT_START":
                     self.states.game_active = "STARTED"
@@ -126,7 +154,8 @@ class PushBox:
 
     def run_game(self):
         """start game"""
-
+        last_state = 0
+        js_msg = ['home', 'up', 'down', 'left', 'right', 'pressed']
         while True:
             if self.states.game_active == "NOT_START":
                 self._check_events()
@@ -135,7 +164,13 @@ class PushBox:
                 self.start_button.draw_button()
 
             elif self.states.game_active == "STARTED":
-                # 响应按键
+                # 响应摇杆与按键
+                state = joystick.detect_js()
+                if state != last_state:
+                    print(js_msg[state])
+                    self._check_event(state)
+                    last_state = state
+                joystick.time.sleep(0.01)
                 self._check_events()
                 # 绘制屏幕
                 self.screen.fill(self.bg_color)
@@ -192,5 +227,6 @@ class PushBox:
 
 if __name__ == '__main__':
     # 创建游戏实例并运行
+    ADC.setup(0x48)
     ai = PushBox()
     ai.run_game()
